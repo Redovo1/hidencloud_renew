@@ -154,7 +154,7 @@ class WebDavManager:
 
     def download(self):
         if not self.url or not self.user:
-            log_print("⚠️ 未配置 WebDAV，跳过云端同步")
+            log_print("💾 未配置 WebDAV，使用本地缓存（GitHub Actions Cache 会负责跨运行持久化）")
             return
 
         log_print("☁️ 正在从 Infinicloud 下载缓存...")
