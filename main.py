@@ -778,14 +778,39 @@ class HidenCloudBot:
 
 # ================= 主程序 =================
 if __name__ == '__main__':
-    env_cookies = os.environ.get("HIDEN_COOKIE", "")
-    cookies_list = re.split(r'[&\n]', env_cookies)
-    cookies_list = [c for c in cookies_list if c.strip()]
+    # 按顺序收集 Cookie：HIDEN_COOKIE -> HIDEN_COOKIE_2 -> HIDEN_COOKIE_3 ...
+    # 每个变量内部仍支持用换行或 & 分隔多个账号（向后兼容）
+    def _collect_env_cookies():
+        collected = []
+        sources = []
+
+        primary = os.environ.get("HIDEN_COOKIE", "")
+        if primary.strip():
+            sources.append(("HIDEN_COOKIE", primary))
+
+        # 自动发现 HIDEN_COOKIE_2、HIDEN_COOKIE_3 ... 最多扫到 _20，够用且避免死循环
+        for n in range(2, 21):
+            key = f"HIDEN_COOKIE_{n}"
+            val = os.environ.get(key, "")
+            if val.strip():
+                sources.append((key, val))
+
+        for key, raw in sources:
+            parts = [c.strip() for c in re.split(r'[&\n]', raw) if c.strip()]
+            for p in parts:
+                collected.append((key, p))
+        return collected
+
+    cookie_sources = _collect_env_cookies()
+    cookies_list = [c for _, c in cookie_sources]
     any_retry_needed = False
 
     if not cookies_list:
-        log_print("❌ 未配置环境变量 HIDEN_COOKIE")
+        log_print("❌ 未配置任何 Cookie 环境变量（HIDEN_COOKIE / HIDEN_COOKIE_2 ...）")
         sys.exit(1)
+
+    used_keys = sorted(set(k for k, _ in cookie_sources))
+    log_print(f"📦 共加载 {len(cookies_list)} 个账号，来源变量: {', '.join(used_keys)}")
 
     WebDavManager().download()
 

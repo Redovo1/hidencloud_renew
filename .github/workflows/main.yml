@@ -36,6 +36,10 @@ jobs:
     - name: Run Script
       env:
         HIDEN_COOKIE: ${{ secrets.HIDEN_COOKIE }}
+        HIDEN_COOKIE_2: ${{ secrets.HIDEN_COOKIE_2 }}
+        HIDEN_COOKIE_3: ${{ secrets.HIDEN_COOKIE_3 }}
+        HIDEN_COOKIE_4: ${{ secrets.HIDEN_COOKIE_4 }}
+        HIDEN_COOKIE_5: ${{ secrets.HIDEN_COOKIE_5 }}
         WP_APP_TOKEN_ONE: ${{ secrets.WP_APP_TOKEN_ONE }}
         WP_UIDs: ${{ secrets.WP_UIDs }}
         WEBDAV_URL: ${{ secrets.WEBDAV_URL }}
