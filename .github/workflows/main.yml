@@ -33,6 +33,17 @@ jobs:
       run: |
         pip install -r requirements.txt
 
+    # 从 GitHub Actions Cache 恢复上次运行保存的 Cookie 文件（私有，公开仓库也安全）
+    - name: Restore Cookie Cache
+      id: cookie-cache
+      uses: actions/cache/restore@v4
+      with:
+        path: hiden_cookies.json
+        # 用日期做 key，每天都能写入新的，同时 restore-keys 保底拿最近一次
+        key: hiden-cookies-${{ github.run_id }}
+        restore-keys: |
+          hiden-cookies-
+
     - name: Run Script
       env:
         HIDEN_COOKIE: ${{ secrets.HIDEN_COOKIE }}
@@ -108,3 +119,12 @@ jobs:
         } >> "$GITHUB_STEP_SUMMARY"
     
         exit "$code"
+
+
+    # 每次运行结束后把最新 Cookie 文件存回 Cache（即使脚本失败也存，避免丢最新 Cookie）
+    - name: Save Cookie Cache
+      if: always() && hashFiles('hiden_cookies.json') != ''
+      uses: actions/cache/save@v4
+      with:
+        path: hiden_cookies.json
+        key: hiden-cookies-${{ github.run_id }}
