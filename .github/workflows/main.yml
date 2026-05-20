@@ -3,6 +3,9 @@ name: HidenCloud Auto Renew (Python)
 
 on:
   workflow_dispatch:
+  schedule:
+    # 每天北京时间 09:20 自动运行；Random Cron 成功后会随机调整分钟，避免固定整点
+    - cron: '20 1 * * *'
 
 permissions:
   contents: read # 主脚本只需要读权限，修改权限交给 cron.yml
